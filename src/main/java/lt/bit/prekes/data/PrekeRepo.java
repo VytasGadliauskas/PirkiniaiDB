@@ -89,7 +89,7 @@ public class PrekeRepo {
     public static Double sumaPagalDatas(Connection conn, java.util.Date data_nuo, java.util.Date data_iki) throws SQLException {
         double suma = 0;
         try (PreparedStatement preparedStatement = conn.prepareStatement(
-                "select sum(`Prekes`.`kiekis`*`Prekes`.`kaina`) as suma from Cekis, Prekes  WHERE Cekis.id=Prekes.cekis_id AND (Cekis.data > ? AND Cekis.data < ?);")) {
+                "select sum(`Prekes`.`kiekis`*`Prekes`.`kaina`) as suma from Cekis, Prekes  WHERE Cekis.id=Prekes.cekis_id AND (Cekis.data >= ? AND Cekis.data <= ?);")) {
             preparedStatement.setDate(1, new Date(data_nuo.getTime()));
             preparedStatement.setDate(2, new Date(data_iki.getTime()));
             ResultSet rs = preparedStatement.executeQuery();
@@ -108,7 +108,7 @@ public class PrekeRepo {
         try (PreparedStatement preparedStatement = conn.prepareStatement(
                 "select Tipas.pavadinimas as tipas, sum(Prekes.kiekis*Prekes.kaina) as suma  from Cekis, Prekes, Tipas\n" +
                         " WHERE Cekis.id=Prekes.cekis_id AND Prekes.tipas_id=Tipas.id \n" +
-                        " AND (Cekis.data > ? AND Cekis.data < ?) GROUP BY Tipas.pavadinimas;")) {
+                        " AND (Cekis.data >= ? AND Cekis.data <= ?) GROUP BY Tipas.pavadinimas;")) {
             preparedStatement.setDate(1, new Date(data_nuo.getTime()));
             preparedStatement.setDate(2, new Date(data_iki.getTime()));
             ResultSet rs = preparedStatement.executeQuery();

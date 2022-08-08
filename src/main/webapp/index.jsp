@@ -584,7 +584,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-       <form action="index.jsp" method="GET">
+       <form action="index.jsp" method="POST">
          <table class="table border border-primary border-2">
            <thead>
                <tr class="table-primary rounded-top">

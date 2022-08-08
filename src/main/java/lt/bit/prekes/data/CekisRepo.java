@@ -25,7 +25,7 @@ public class CekisRepo {
     }
 
     public static List<Cekis> getCekiaiPagalData(Connection conn,  java.util.Date data_nuo, java.util.Date data_iki) throws SQLException {
-        try (PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM Cekis WHERE Cekis.data > ? AND Cekis.data < ?;")) {
+        try (PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM Cekis WHERE Cekis.data >= ? AND Cekis.data <= ?;")) {
             preparedStatement.setDate(1, new Date(data_nuo.getTime()));
             preparedStatement.setDate(2, new Date(data_iki.getTime()));
             ResultSet rs = preparedStatement.executeQuery();

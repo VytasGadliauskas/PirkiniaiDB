@@ -1,0 +1,11 @@
+.imgBtn {
+    border: 1px solid #1C6EA4;
+    border-radius: 5px;
+}
+ 
+.imgBtn:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+    background-color: #5B5EA6;
+}
+  

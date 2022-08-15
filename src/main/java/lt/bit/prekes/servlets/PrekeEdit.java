@@ -1,24 +1,23 @@
 package lt.bit.prekes.servlets;
 
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import lt.bit.prekes.data.Preke;
-import lt.bit.prekes.data.PrekeRepo;
-
+import lt.bit.prekes.data.Tipas;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 @WebServlet(name = "PrekeEdit", urlPatterns = {"/editPreke"})
 public class PrekeEdit  extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        String responds = "index.jsp";
         if( !"".equals(request.getParameter("id")) &&
                 !"".equals(request.getParameter("preke")) &&
                 !"".equals(request.getParameter("kiekis")) &&
@@ -28,17 +27,25 @@ public class PrekeEdit  extends HttpServlet {
             String prekep = request.getParameter("preke").trim();
             Double kiekis = Double.parseDouble(request.getParameter("kiekis"));
             Double kaina = Double.parseDouble(request.getParameter("kaina"));
+
             int tipas_id = Integer.parseInt(request.getParameter("tipas_id"));
 
-            Preke preke = new Preke(id, 0 , prekep , kiekis, kaina, tipas_id);
-            System.out.println(preke);
-            try (Connection conn = (Connection) request.getAttribute("conn")) {
-                PrekeRepo.updatePreke(preke, conn);
-            } catch (SQLException e) {
-                response.sendRedirect("klaida.html");
+            try {
+                EntityManager em = (EntityManager) request.getAttribute("em");
+                EntityTransaction tx = em.getTransaction();
+                tx.begin();
+                Tipas tipas = em.find(Tipas.class, tipas_id);
+                Preke preke = em.find(Preke.class, id);
+                preke.setPreke(prekep);
+                preke.setKiekis(kiekis);
+                preke.setKaina(kaina);
+                preke.setTipas(tipas);
+                tx.commit();
+            } catch (Exception e) {
+                responds = "klaida.jsp?klaida="+e.getMessage();
             }
         }
-        response.sendRedirect("index.jsp");
+        response.sendRedirect(responds);
     }
 
     @Override

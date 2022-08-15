@@ -1,83 +1,101 @@
 package lt.bit.prekes.data;
 
+import jakarta.persistence.*;
+
+@Entity(name="Prekes")
+@Table(name = "Prekes")
 public class Preke {
-    private int id;
-    private int cekis_id;
+
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "preke", nullable = false)
     private String preke;
+
+    @Column(name = "kiekis", nullable = false)
     private double kiekis;
+
+    @Column(name = "kaina", nullable = false)
     private double kaina;
-    private int tipas_id;
 
-    public Preke(int id, int cekis_id, String preke, double kiekis, double kaina, int tipas_id) {
+    @ManyToOne
+    @JoinColumn(name = "cekis_id")
+    private Cekis cekis;
+
+    @ManyToOne
+    @JoinColumn(name = "tipas_id")
+    private Tipas tipas;
+
+    public Preke() {
+    }
+
+    public Preke(Cekis cekis, String prekep, Double kiekis, Double kaina, Tipas tipas) {
+        this.cekis = cekis;
+        this.preke = prekep;
+        this.kiekis = kiekis;
+        this.kaina = kaina;
+        this.tipas = tipas;
+    }
+
+    public void setId(Integer id) {
         this.id = id;
-        this.cekis_id = cekis_id;
-        this.preke = preke;
-        this.kiekis = kiekis;
-        this.kaina = kaina;
-        this.tipas_id = tipas_id;
     }
 
-    public Preke(int cekis_id, String preke, double kiekis, double kaina, int tipas_id) {
-        this.cekis_id = cekis_id;
-        this.preke = preke;
-        this.kiekis = kiekis;
-        this.kaina = kaina;
-        this.tipas_id = tipas_id;
-    }
-
-    public int getId() {
+    public Integer getId() {
         return id;
-    }
-
-    public int getCekis_id() {
-        return cekis_id;
-    }
-
-    public void setCekis_id(int cekis_id) {
-        this.cekis_id = cekis_id;
-    }
-
-    public String getPreke() {
-        return preke;
     }
 
     public void setPreke(String preke) {
         this.preke = preke;
     }
 
-    public double getKiekis() {
-        return kiekis;
+    public String getPreke() {
+        return preke;
     }
 
     public void setKiekis(double kiekis) {
         this.kiekis = kiekis;
     }
 
-    public double getKaina() {
-        return kaina;
+    public double getKiekis() {
+        return kiekis;
     }
 
     public void setKaina(double kaina) {
         this.kaina = kaina;
     }
 
-    public int getTipas_id() {
-        return tipas_id;
+    public double getKaina() {
+        return kaina;
     }
 
-    public void setTipas_id(int tipas_id) {
-        this.tipas_id = tipas_id;
+    public Cekis getCekis() {
+        return cekis;
+    }
+
+    public void setCekis(Cekis cekis) {
+        this.cekis = cekis;
+    }
+
+    public Tipas getTipas() {
+        return tipas;
+    }
+
+    public void setTipas(Tipas tipas) {
+        this.tipas = tipas;
     }
 
     @Override
     public String toString() {
-        return "Prekes{" +
+        return "Preke{" +
                 "id=" + id +
-                ", cekis_id=" + cekis_id +
-                ", preke='" + preke + '\'' +
+                ", cekis_id=" + cekis.getId() +
+                ", preke='" + preke +
                 ", kiekis=" + kiekis +
                 ", kaina=" + kaina +
-                ", tipas_id=" + tipas_id +
+                ", tipas_id=" + tipas.getId() +
                 '}';
     }
 }

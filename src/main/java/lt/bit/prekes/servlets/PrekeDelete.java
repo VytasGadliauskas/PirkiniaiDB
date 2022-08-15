@@ -1,17 +1,15 @@
 package lt.bit.prekes.servlets;
 
 
-import lt.bit.prekes.data.CekisRepo;
-import lt.bit.prekes.data.PrekeRepo;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import lt.bit.prekes.data.Preke;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 @WebServlet(name = "PrekeDelete", urlPatterns = {"/deletePreke"})
 public class PrekeDelete extends HttpServlet {
@@ -21,11 +19,15 @@ public class PrekeDelete extends HttpServlet {
         // System.out.println("parametrai : "+request.getParameter("id"));
         if (!"".equals(request.getParameter("id"))) {
             int id = Integer.parseInt(request.getParameter("id"));
-            try (Connection conn = (Connection) request.getAttribute("conn")) {
-                PrekeRepo.deletePreke(id, conn);
-            } catch (SQLException e) {
-                System.out.println("deletePreke klaida " + e.getMessage());
-                response.sendRedirect("klaida.html");
+            try {
+                EntityManager em = (EntityManager) request.getAttribute("em");
+                EntityTransaction tx = em.getTransaction();
+                tx.begin();
+                Preke preke = em.find(Preke.class, id);
+                em.remove(preke);
+                tx.commit();
+            } catch (Exception e) {
+                response.sendRedirect("klaida.jsp?klaida="+e.getMessage());
             }
         } else {
             System.out.println("deletePreke klaida nera id");

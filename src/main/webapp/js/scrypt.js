@@ -51,45 +51,30 @@
    }
  ///////////////////////////////  PREKES
   function editPrekesModalF(element) {
-        // tableRowElement = element.parentElement.parentElement.parentElement.parentElement;
-
-        // console.log(element.parentElement.parentElement.parentElement.parentElement.parentElement);
-        //  const cekis_id = tableRowElement.getElementsByClassName('cekis_id')[0].value;
-        //  const data = tableRowElement.getElementsByClassName('tablecekisdata')[0].innerHTML;
-        //  const parduotuve = tableRowElement.getElementsByClassName('tablecekisparduotuve')[0].innerHTML;
-        //  const aprasymas = tableRowElement.getElementsByClassName('tablecekisaprasymas')[0].innerHTML;
-
-        //  document.getElementById('editcekisid').value = id;
-        //  document.getElementById('editcekisdata').value = data;
-        //  document.getElementById('editcekisparduotuve').value = parduotuve;
-        //  document.getElementById('editcekisaprasymas').value = aprasymas;
-        //  loadPrekes(cekis_id);
           document.getElementById("editPrekesModal").style.display = "block"
           document.getElementById("editPrekesModal").classList.add("show");
-      }
+  }
 
-      function closeEditPrekesModalF() {
+  function closeEditPrekesModalF() {
           document.getElementById("editPrekesModal").style.display = "none"
           document.getElementById("editCekisModal").style.display = "block"
           document.getElementById("editCekisModal").classList.add("show");
-      }
+  }
 
-   function addPrekeModalF(element) {
+  function addPrekeModalF(element) {
 
           document.getElementById("addPrekeModal").style.display = "block"
           document.getElementById("addPrekeModal").classList.add("show");
-      }
+  }
 
-      function closeAddPrekeModalF() {
+  function closeAddPrekeModalF() {
           document.getElementById("addPrekeModal").style.display = "none"
-                    document.getElementById("editPrekesModal").style.display = "block"
-                    document.getElementById("editPrekesModal").classList.add("show");
-      }
+          document.getElementById("editPrekesModal").style.display = "block"
+          document.getElementById("editPrekesModal").classList.add("show");
+  }
 
   function editPrekeModalF(element) {
           tableRowElement = element.parentElement.parentElement;
-          console.log(tableRowElement);
-
           const id = tableRowElement.getElementsByClassName('tableprekeid')[0].innerHTML;
           const preke = tableRowElement.getElementsByClassName('tableprekepreke')[0].innerHTML;
           const kiekis = tableRowElement.getElementsByClassName('tableprekekiekis')[0].innerHTML;
@@ -100,7 +85,13 @@
           document.getElementById('editprekepreke').value = preke;
           document.getElementById('editprekekiekis').value = kiekis;
           document.getElementById('editprekekaina').value = kaina;
-          document.getElementById('editpreketipasid').value = tipas_id;
+          let mySelect = document.getElementById('editpreketipasid');
+          for(let i, j = 0; i = mySelect.options[j]; j++) {
+              if(i.text == tipas_id) {
+                  mySelect.selectedIndex = j;
+                  break;
+              }
+          }
 
           document.getElementById("editPrekeModal").style.display = "block"
           document.getElementById("editPrekeModal").classList.add("show");

@@ -1,7 +1,9 @@
 package lt.bit.prekes.servlets;
 
 
-import lt.bit.prekes.data.PrekeRepo;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
+import lt.bit.prekes.dataOLD.PrekeRepo;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,6 +24,7 @@ public class Ataskaita1 extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         if (!"".equals(request.getParameter("data_nuo")) &&
                 !"".equals(request.getParameter("data_iki"))
         ) {
@@ -42,22 +45,25 @@ public class Ataskaita1 extends HttpServlet {
 
             Double suma = 0.0;
 
-            try (Connection conn = (Connection) request.getAttribute("conn")) {
-               suma = PrekeRepo.sumaPagalDatas(conn, data_nuo, data_iki);
-            } catch (SQLException e) {
-                response.sendRedirect("klaida.html");
+            try {
+                EntityManager em = (EntityManager) request.getAttribute("em");
+                Query q = em.createNativeQuery("select sum(`Prekes`.`kiekis`*`Prekes`.`kaina`) as suma from Cekis, Prekes  WHERE Cekis.id=Prekes.cekis_id AND (Cekis.data >= :datanuo AND Cekis.data <= :dataiki)");
+                q.setParameter("datanuo", data_nuo);
+                q.setParameter("dataiki", data_iki);
+                suma = Double.parseDouble(q.getSingleResult().toString());
+            } catch (Exception e) {
+                response.sendRedirect("klaida.jsp?klaida=" + e);
             }
 
-
             PrintWriter writer = response.getWriter();
-            writer.print("<p> Suma nuo <img src=\"img/date-from.png\" alt=\"euro\"width=\"40\" height=\"42\"> "+sdf.format(data_nuo)+
-                    " iki <img src=\"img/date-to.png\" alt=\"euro\"width=\"40\" height=\"42\"> "+sdf.format(data_iki)+
-                    " <img src=\"img/buy.png\" alt=\"euro\"width=\"40\" height=\"42\"> nupirktų prekių: "+suma+
+            writer.print("<p> Suma nuo <img src=\"img/date-from.png\" alt=\"euro\"width=\"40\" height=\"42\"> " + sdf.format(data_nuo) +
+                    " iki <img src=\"img/date-to.png\" alt=\"euro\"width=\"40\" height=\"42\"> " + sdf.format(data_iki) +
+                    " <img src=\"img/buy.png\" alt=\"euro\"width=\"40\" height=\"42\"> nupirktų prekių: " + suma +
                     "<img src=\"img/euro.png\" alt=\"euro\"width=\"40\" height=\"42\"> </p> ");
             writer.flush();
 
         } else {
-            response.sendRedirect("klaida.html");
+            response.sendRedirect("klaida.jsp?klaida=Formuojant_Ataskaita1");
         }
     }
 

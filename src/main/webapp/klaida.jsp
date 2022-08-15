@@ -1,3 +1,9 @@
+<%
+String klaida = "Nezinoma klaida";
+if (!"".equals(request.getParameter("klaida"))) {
+    klaida = request.getParameter("klaida");
+} %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,8 +19,10 @@
 <body>
     <div class="d-flex flex-column align-items-center justify-content-center vh-100 bg-primary">
         <h1 class="display-1 fw-bold text-white">Klaida</h1>
+        <p>
+              <%=klaida%>
+        </p>
         <a class="fw-bold text-white" href="index.jsp" >Bandyti dar karta ...</a>
-
     </div>
 </body>
 </html>

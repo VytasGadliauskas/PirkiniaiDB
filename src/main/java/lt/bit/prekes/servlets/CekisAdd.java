@@ -1,7 +1,8 @@
 package lt.bit.prekes.servlets;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import lt.bit.prekes.data.Cekis;
-import lt.bit.prekes.data.CekisRepo;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,8 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,13 +20,13 @@ public class CekisAdd  extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        String responds = "index.jsp";
         if( !"".equals(request.getParameter("data")) &&
                 !"".equals(request.getParameter("pavadinimas"))) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date data = null;
             try {
-                 data = (Date) sdf.parse(request.getParameter("data"));
+                 data = sdf.parse(request.getParameter("data"));
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
@@ -37,15 +36,19 @@ public class CekisAdd  extends HttpServlet {
             if (!"".equals(request.getParameter("aprasymas"))) {
                  aprasymas = request.getParameter("aprasymas").trim();
             }
-            cekis = new Cekis(0, data , pavadinimas, aprasymas);
+            cekis = new Cekis(new java.sql.Date(data.getTime()) , pavadinimas, aprasymas);
 
-            try (Connection conn = (Connection) request.getAttribute("conn")) {
-                CekisRepo.addCekis(cekis, conn);
-            } catch (SQLException e) {
-                response.sendRedirect("klaida.html");
+            try {
+                EntityManager em = (EntityManager) request.getAttribute("em");
+                EntityTransaction tx = em.getTransaction();
+                tx.begin();
+                em.persist(cekis);
+                tx.commit();
+            } catch (Exception e) {
+                responds = "klaida.jsp?klaida="+e.getMessage();
             }
         }
-        response.sendRedirect("index.jsp");
+        response.sendRedirect(responds);
     }
 
         @Override

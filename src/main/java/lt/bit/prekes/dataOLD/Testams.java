@@ -1,4 +1,4 @@
-package lt.bit.prekes.data;
+package lt.bit.prekes.dataOLD;
 
 import java.sql.*;
 import java.util.List;

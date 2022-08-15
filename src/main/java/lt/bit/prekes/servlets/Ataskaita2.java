@@ -2,7 +2,9 @@ package lt.bit.prekes.servlets;
 
 
 import com.google.gson.Gson;
-import lt.bit.prekes.data.PrekeRepo;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
+import lt.bit.prekes.dataOLD.PrekeRepo;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,6 +18,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -40,12 +44,23 @@ public class Ataskaita2 extends HttpServlet {
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
-            Map<String,Double> map = null;
-            try (Connection conn = (Connection) request.getAttribute("conn")) {
-                map = PrekeRepo.mapPagalDatasTipus(conn, data_nuo, data_iki);
-            } catch (SQLException e) {
-                response.sendRedirect("klaida.html");
+            Map<String, Double> map = new HashMap<>();
+
+            try {
+                EntityManager em = (EntityManager) request.getAttribute("em");
+                Query q = em.createNativeQuery("select Tipas.pavadinimas as tipas, sum(Prekes.kiekis*Prekes.kaina) as suma  from Cekis, Prekes, Tipas" +
+                        " WHERE Cekis.id=Prekes.cekis_id AND Prekes.tipas_id=Tipas.id " +
+                        " AND (Cekis.data >= :datanuo AND Cekis.data <= :dataiki) GROUP BY Tipas.pavadinimas");
+                q.setParameter("datanuo", data_nuo);
+                q.setParameter("dataiki", data_iki);
+                List<Object[]> list = q.getResultList();
+                for (Object[] o : list) {
+                    map.put(o[0].toString(), Double.parseDouble(o[1].toString()));
+                }
+            } catch (Exception e) {
+                response.sendRedirect("klaida.jsp?klaida=" + e);
             }
+
             Gson gson = new Gson();
             String mapJsonString = gson.toJson(map);
 
@@ -56,7 +71,7 @@ public class Ataskaita2 extends HttpServlet {
             out.flush();
 
         } else {
-            response.sendRedirect("klaida.html");
+            response.sendRedirect("klaida.jsp?klaida=FormuojantAtaskaita2");
         }
     }
 

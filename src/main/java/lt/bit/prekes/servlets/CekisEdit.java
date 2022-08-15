@@ -1,7 +1,9 @@
 package lt.bit.prekes.servlets;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import lt.bit.prekes.data.Cekis;
-import lt.bit.prekes.data.CekisRepo;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,8 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,6 +20,7 @@ public class CekisEdit extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String responds = "index.jsp";
         if (!"".equals(request.getParameter("id")) &&
                 !"".equals(request.getParameter("data")) &&
                 !"".equals(request.getParameter("parduotuve"))) {
@@ -33,19 +34,23 @@ public class CekisEdit extends HttpServlet {
             }
             String pavadinimas = request.getParameter("parduotuve").trim();
             String aprasymas = "";
-            Cekis cekis = null;
             if (!"".equals(request.getParameter("aprasymas"))) {
                 aprasymas = request.getParameter("aprasymas").trim();
             }
-            cekis = new Cekis(id, data, pavadinimas, aprasymas);
-            System.out.println(cekis);
-            try (Connection conn = (Connection) request.getAttribute("conn")) {
-                CekisRepo.updateCekis(cekis, conn);
-            } catch (SQLException e) {
-                response.sendRedirect("klaida.html");
+            try {
+                EntityManager em = (EntityManager) request.getAttribute("em");
+                EntityTransaction tx = em.getTransaction();
+                tx.begin();
+                Cekis cekis = em.find(Cekis.class, id);
+                cekis.setData(new java.sql.Date(data.getTime()));
+                cekis.setParduotuve(pavadinimas);
+                cekis.setAprasymas(aprasymas);
+                tx.commit();
+            } catch (Exception e) {
+                responds = "klaida.jsp?klaida="+e.getMessage();
             }
         }
-        response.sendRedirect("index.jsp");
+        response.sendRedirect(responds);
     }
 
     @Override

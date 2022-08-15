@@ -1,52 +1,80 @@
 package lt.bit.prekes.data;
 
-import java.util.Date;
+import jakarta.persistence.*;
+import lt.bit.prekes.data.Preke;
 
+
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "Cekis")
 public class Cekis {
-    private int id;
-    private Date data;
-    private String pavadinimas;
-    private String aprasymas;
 
-    public Cekis(int id, Date data, String pavadinimas) {
-        this.id = id;
-        this.data = data;
-        this.pavadinimas = pavadinimas;
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "data", nullable = false)
+    private Date data;
+
+    @Column(name = "parduotuve", nullable = false)
+    private String parduotuve;
+
+    @Column(name = "aprasymas")
+    private String aprasymas;
+    @jakarta.persistence.OneToMany(mappedBy = "cekis")
+    private List<Preke> prekes = new ArrayList<>();
+
+    public Cekis() {
     }
 
-    public Cekis(int id, Date data, String pavadinimas, String aprasymas) {
-        this.id = id;
+    public Cekis(Date data, String parduotuve, String aprasymas) {
         this.data = data;
-        this.pavadinimas = pavadinimas;
+        this.parduotuve = parduotuve;
         this.aprasymas = aprasymas;
     }
 
-    public int getId() {
-        return id;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public Date getData() {
-        return data;
+    public Integer getId() {
+        return id;
     }
 
     public void setData(Date data) {
         this.data = data;
     }
 
-    public String getPavadinimas() {
-        return pavadinimas;
+    public Date getData() {
+        return data;
     }
 
-    public void setPavadinimas(String pavadinimas) {
-        this.pavadinimas = pavadinimas;
+    public void setParduotuve(String parduotuve) {
+        this.parduotuve = parduotuve;
+    }
+
+    public String getParduotuve() {
+        return parduotuve;
+    }
+
+    public void setAprasymas(String aprasymas) {
+        this.aprasymas = aprasymas;
     }
 
     public String getAprasymas() {
         return aprasymas;
     }
 
-    public void setAprasymas(String aprasymas) {
-        this.aprasymas = aprasymas;
+    public List<Preke> getPrekes() {
+        return prekes;
+    }
+
+    public void setPrekes(List<Preke> prekes) {
+        this.prekes = prekes;
     }
 
     @Override
@@ -54,8 +82,6 @@ public class Cekis {
         return "Cekis{" +
                 "id=" + id +
                 ", data=" + data +
-                ", pavadinimas='" + pavadinimas + '\'' +
-                ", aprasymas='" + aprasymas + '\'' +
-                '}';
+                ", parduotuve='" + parduotuve + ", aprasymas='" + aprasymas + '}';
     }
 }

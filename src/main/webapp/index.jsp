@@ -8,14 +8,12 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="lt.bit.prekes.data.Cekis"%>
-<%@page import="lt.bit.prekes.data.CekisRepo"%>
-<%@page import="lt.bit.prekes.data.PrekeRepo"%>
 <%@page import="lt.bit.prekes.data.Tipas"%>
-<%@page import="lt.bit.prekes.data.TipasRepo"%>
-<%@page import="java.sql.Connection"%>
 <%@page import="java.text.ParseException"%>
+<%@page import="jakarta.persistence.Query"%>
+<%@page import="jakarta.persistence.EntityManager"%>
+
 <%
-    Connection conn = (Connection) request.getAttribute("conn");
     List<Cekis> cekiai = null;
     Set<String> parduotuves = null;
     Map<Integer,Double> cekisSuma = new HashMap<>();
@@ -23,8 +21,9 @@
     Map<Integer,String> tipaiMap = new HashMap<>();
     double visaSuma = 0.0;
 
-    if (conn != null) {
+    EntityManager em = (EntityManager) request.getAttribute("em");
 
+    if (em != null) {
          if ((!"".equals(request.getParameter("data_nuo")) && request.getParameter("data_nuo") != null) &&
              (!"".equals(request.getParameter("data_iki")) && request.getParameter("data_iki") != null)) {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -41,21 +40,34 @@
                     } catch (ParseException e) {
                         throw new RuntimeException(e);
                     }
-
-                   cekiai = CekisRepo.getCekiaiPagalData(conn,data_nuo,data_iki);
-                   visaSuma = PrekeRepo.sumaPagalDatas(conn, data_nuo, data_iki);
-                   System.out.println("filtras yra");
+                    Query qc1 = em.createQuery("SELECT c FROM Cekis c WHERE c.data >= :datanuo AND c.data <= :dataiki");
+                    qc1.setParameter("datanuo", data_nuo);
+                    qc1.setParameter("dataiki", data_iki);
+                    cekiai =  qc1.getResultList();
+                    Query qvisasuma1 = em.createNativeQuery("select sum(`Prekes`.`kiekis`*`Prekes`.`kaina`) as suma from Cekis, Prekes  WHERE Cekis.id=Prekes.cekis_id AND (Cekis.data >= :datanuo AND Cekis.data <= :dataiki)");
+                    qvisasuma1.setParameter("datanuo", data_nuo);
+                    qvisasuma1.setParameter("dataiki", data_iki);
+                    visaSuma = Double.parseDouble(qvisasuma1.getSingleResult().toString());
+                    System.out.println("filtras yra");
          } else {
-                   cekiai = CekisRepo.getCekiai(conn);
-                   visaSuma = PrekeRepo.visaSumaPagal(conn);
-                   System.out.println("filtras nera");
+                    Query qc2 = em.createQuery("select c from Cekis c");
+                    cekiai =  qc2.getResultList();
+                    Query qvisasuma2 = em.createNativeQuery("select sum(`kiekis`*`kaina`) as suma  from Prekes");
+                    visaSuma = Double.parseDouble(qvisasuma2.getSingleResult().toString());
+                    System.out.println("filtras nera");
          }
-
-       tipai = TipasRepo.getTipai(conn);
+       Query qtipai = em.createQuery("select t from Tipas t");
+       tipai =  qtipai.getResultList();
        parduotuves = new HashSet<>();
        for (Cekis cekis : cekiai) {
-             parduotuves.add(cekis.getPavadinimas());
-             cekisSuma.put(cekis.getId(),PrekeRepo.sumaPagalCeki(cekis.getId(),conn));
+             parduotuves.add(cekis.getParduotuve());
+             Query qvisasumacekio = em.createNativeQuery("select sum(kiekis*kaina) as suma from Prekes WHERE `cekis_id`=:cekisid");
+             qvisasumacekio.setParameter("cekisid", cekis.getId());
+             double visaSumaCekio = 0.0;
+             if (qvisasumacekio.getSingleResult() != null){
+                visaSumaCekio = Double.parseDouble(qvisasumacekio.getSingleResult().toString());
+             }
+             cekisSuma.put(cekis.getId(),visaSumaCekio);
        }
     }
 %>  
@@ -124,7 +136,7 @@
                             <img class="imgBtn" src="img/shopping-cart.png" onclick="editCekisModalF(this, <%=cekis.getId()%>)" alt="Edit" width="40" height="42"> </td>
                            <th class="tablecekisid" scope="row"><%=cekis.getId()%></th>
                            <td class="tablecekisdata"><%=sdf.format(cekis.getData())%></td >
-                           <td class="tablecekisparduotuve"><%=cekis.getPavadinimas()%></td>
+                           <td class="tablecekisparduotuve"><%=cekis.getParduotuve()%></td>
                            <td class="tablecekisaprasymas"><%=cekis.getAprasymas()%></td>
                            <td class="tablecekissuma"><%=cekisSuma.get(cekis.getId())%> <img src="img/euro.png" alt="euro"width="40" height="42"></td>
                       </tr>

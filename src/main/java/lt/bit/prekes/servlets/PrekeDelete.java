@@ -3,18 +3,13 @@ package lt.bit.prekes.servlets;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
-import lt.bit.prekes.data.Cekis;
 import lt.bit.prekes.data.Preke;
-import lt.bit.prekes.dataOLD.PrekeRepo;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 @WebServlet(name = "PrekeDelete", urlPatterns = {"/deletePreke"})
 public class PrekeDelete extends HttpServlet {

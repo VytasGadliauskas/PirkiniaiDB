@@ -27,7 +27,9 @@ public class PrekeEdit  extends HttpServlet {
             String prekep = request.getParameter("preke").trim();
             Double kiekis = Double.parseDouble(request.getParameter("kiekis"));
             Double kaina = Double.parseDouble(request.getParameter("kaina"));
+
             int tipas_id = Integer.parseInt(request.getParameter("tipas_id"));
+
             try {
                 EntityManager em = (EntityManager) request.getAttribute("em");
                 EntityTransaction tx = em.getTransaction();

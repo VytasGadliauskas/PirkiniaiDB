@@ -443,7 +443,14 @@
                     <td><input type="text" class="form-control" id="editprekepreke" name="preke" required></td>
                     <td><input type="number" class="form-control" id="editprekekiekis" name="kiekis" min="0" step="any" required></td>
                     <td><input type="number" class="form-control" id="editprekekaina" name="kaina" min="0" step="any" required></td>
-                    <td><input type="text" class="form-control" id="editpreketipasid" name="tipas_id" required></td>
+                    <td><select class="form-select" id="editpreketipasid" name="tipas_id" required>
+                        <option selected></option>
+                        <%  for (Tipas tipas : tipai) { %>
+                        <option value="<%=tipas.getId()%>"><%=tipas.getPavadinimas()%></option>
+                        <% } %>
+                        </select>
+                    </td>
+
                   </tr>
                 </tbody>
             </table>

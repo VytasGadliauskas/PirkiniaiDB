@@ -3,8 +3,6 @@ package lt.bit.prekes.servlets;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import lt.bit.prekes.dataOLD.PrekeRepo;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -12,8 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
